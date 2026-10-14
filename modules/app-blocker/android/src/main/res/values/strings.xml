@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="focusday_a11y_description">FocusDay only checks which app is in the foreground so it can show a block screen during a focus session. It does not read or store anything on your screen.</string>
+</resources>
