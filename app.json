@@ -31,14 +31,15 @@
         "expo-build-properties",
         {
           "android": {
-            "compileSdkVersion": 35,
+            "compileSdkVersion": 36,
             "targetSdkVersion": 35,
             "minSdkVersion": 26
           }
         }
       ],
       "expo-notifications",
-      "./modules/app-blocker/plugin/app.plugin.js"
+      "./modules/app-blocker/plugin/app.plugin.js",
+      "expo-font"
     ],
     "scheme": "focusday",
     "extra": {
