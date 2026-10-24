@@ -59,8 +59,8 @@ class AppBlockerModule : Module() {
       if (Build.VERSION.SDK_INT >= 26) context.startForegroundService(svc) else context.startService(svc)
     }
 
-    AsyncFunction("stopFocus") { reason: String ->
-      store.finish("broken", reason.ifBlank { null })
+    AsyncFunction("stopFocus") { reason: String? ->
+      store.finish("broken", reason?.ifBlank { null })
       context.stopService(Intent(context, FocusForegroundService::class.java))
     }
 

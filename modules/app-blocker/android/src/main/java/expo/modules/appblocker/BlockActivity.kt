@@ -56,7 +56,7 @@ class BlockActivity : Activity() {
     store = FocusStateStore(this)
     val s = store.get()
     if (!s.active) { finish(); return }
-    setShowWhenLocked(true)
+    if (android.os.Build.VERSION.SDK_INT >= 27) setShowWhenLocked(true)
     buildUi(s)
   }
 
