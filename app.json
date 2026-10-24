@@ -40,6 +40,13 @@
       "expo-notifications",
       "./modules/app-blocker/plugin/app.plugin.js"
     ],
-    "scheme": "focusday"
+    "scheme": "focusday",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "78fa6d8d-0806-4e9f-b9b0-3fda28420804"
+      }
+    },
+    "owner": "mohankumarkariappan123"
   }
 }
