@@ -58,6 +58,7 @@ class BlockActivity : Activity() {
     if (!s.active) { finish(); return }
     if (android.os.Build.VERSION.SDK_INT >= 27) setShowWhenLocked(true)
     buildUi(s)
+    if (intent.getBooleanExtra("unlock", false)) startUnlockFlow()
   }
 
   private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()

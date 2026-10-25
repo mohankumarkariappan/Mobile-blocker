@@ -21,12 +21,14 @@ import android.os.Looper
 class FocusForegroundService : Service() {
   private val handler = Handler(Looper.getMainLooper())
   private lateinit var store: FocusStateStore
+  private lateinit var chip: TimerChip
 
   override fun onBind(intent: Intent?): IBinder? = null
 
   override fun onCreate() {
     super.onCreate()
     store = FocusStateStore(this)
+    chip = TimerChip(this, store)
     val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     nm.createNotificationChannel(NotificationChannel(CHANNEL, "Focus session", NotificationManager.IMPORTANCE_LOW))
     nm.createNotificationChannel(NotificationChannel(DONE_CHANNEL, "Focus finished", NotificationManager.IMPORTANCE_DEFAULT))
@@ -43,6 +45,7 @@ class FocusForegroundService : Service() {
     }
 
     startForegroundCompat(buildNotification(state.goal, state.endTime))
+    chip.show()
     handler.removeCallbacksAndMessages(null)
     handler.postDelayed({ finishIfDone() }, (state.endTime - System.currentTimeMillis()).coerceAtLeast(0) + 300)
     return START_STICKY
@@ -98,7 +101,7 @@ class FocusForegroundService : Service() {
     else @Suppress("DEPRECATION") stopForeground(true)
   }
 
-  override fun onDestroy() { handler.removeCallbacksAndMessages(null); super.onDestroy() }
+  override fun onDestroy() { handler.removeCallbacksAndMessages(null); chip.hide(); super.onDestroy() }
 
   companion object {
     const val CHANNEL = "focusday_session"
