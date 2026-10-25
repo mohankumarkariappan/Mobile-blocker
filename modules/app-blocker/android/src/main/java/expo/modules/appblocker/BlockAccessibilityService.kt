@@ -2,6 +2,10 @@ package expo.modules.appblocker
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 
 /**
@@ -10,6 +14,8 @@ import android.view.accessibility.AccessibilityEvent
  */
 class BlockAccessibilityService : AccessibilityService() {
   private lateinit var store: FocusStateStore
+  private val handler = Handler(Looper.getMainLooper())
+  private var lastBlockAt = 0L
 
   override fun onServiceConnected() {
     super.onServiceConnected()
@@ -24,10 +30,24 @@ class BlockAccessibilityService : AccessibilityService() {
     val state = store.get()
     if (!state.active || pkg !in state.blocked) return
 
-    val intent = Intent(this, BlockActivity::class.java).addFlags(
-      Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_ANIMATION,
-    )
-    startActivity(intent)
+    // Several events fire while an app opens; react once.
+    val now = SystemClock.uptimeMillis()
+    if (now - lastBlockAt < 700) return
+    lastBlockAt = now
+
+    // Push the blocked app away first so it is hidden even if the block screen is slow to appear.
+    performGlobalAction(GLOBAL_ACTION_HOME)
+    handler.postDelayed({
+      try {
+        startActivity(
+          Intent(this, BlockActivity::class.java).addFlags(
+            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NO_ANIMATION,
+          ),
+        )
+      } catch (e: Exception) {
+        Log.e("FocusDay", "Could not show block screen", e)
+      }
+    }, 120)
   }
 
   override fun onInterrupt() {}

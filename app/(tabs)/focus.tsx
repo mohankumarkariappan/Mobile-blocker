@@ -67,8 +67,9 @@ export default function Focus() {
       else await start(goal.trim(), blocked, durationMs);
       tap('success');
       toast('Focus started. You’ve got this.');
+      router.navigate('/'); // home shows the running session with its remaining time
     } finally { setBusy(false); }
-  }, [blocked, durationMs, goal, mode, start, startUntil, untilEnd, setBlockedDefaults, toast]);
+  }, [blocked, durationMs, goal, mode, router, start, startUntil, untilEnd, setBlockedDefaults, toast]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} edges={['top']}>

@@ -2,6 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 import type { ColorValue } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/hooks/useTheme';
 
 const icon = (name: keyof typeof Feather.glyphMap) =>
@@ -9,13 +10,14 @@ const icon = (name: keyof typeof Feather.glyphMap) =>
 
 export default function TabsLayout() {
   const { c } = useTheme();
+  const insets = useSafeAreaInsets(); // keeps the bar above the system back/home/recents buttons
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: c.primary,
         tabBarInactiveTintColor: c.sub,
-        tabBarStyle: { backgroundColor: c.card, borderTopColor: c.border, height: 68, paddingBottom: 12, paddingTop: 8, elevation: 0, shadowOpacity: 0 },
+        tabBarStyle: { backgroundColor: c.card, borderTopColor: c.border, height: 56 + insets.bottom, paddingBottom: insets.bottom + 6, paddingTop: 8, elevation: 0, shadowOpacity: 0 },
         tabBarLabelStyle: { fontWeight: '500', fontSize: 11 },
         sceneStyle: { backgroundColor: c.bg },
       }}

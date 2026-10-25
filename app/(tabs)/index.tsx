@@ -2,7 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { format } from 'date-fns';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DateStrip } from '../../src/components/DateStrip';
@@ -11,10 +11,11 @@ import { TaskCard } from '../../src/components/TaskCard';
 import { TaskEditor } from '../../src/components/TaskEditor';
 import { Button, Card, tap, useToast } from '../../src/components/ui';
 import type { Task } from '../../src/db/types';
+import { useCountdown } from '../../src/hooks/useCountdown';
 import { useTheme } from '../../src/hooks/useTheme';
 import { useFocusStore } from '../../src/store/useFocusStore';
 import { useTaskStore } from '../../src/store/useTaskStore';
-import { fromKey, todayKey } from '../../src/utils/dates';
+import { fmtDuration, fromKey, todayKey } from '../../src/utils/dates';
 import { allDoneMessage, greeting, taskDoneMessage } from '../../src/utils/messages';
 
 const ORDER = { high: 0, medium: 1, low: 2 } as const;
@@ -25,6 +26,8 @@ export default function Today() {
   const toast = useToast();
   const { tasks, add, update, toggle, remove } = useTaskStore();
   const setDraftGoal = useFocusStore((s) => s.setDraftGoal);
+  const status = useFocusStore((s) => s.status);
+  const remaining = useCountdown(status.endTime, status.active);
   const [date, setDate] = useState(todayKey());
   const [editing, setEditing] = useState<Task | null>(null);
   const [open, setOpen] = useState(false);
@@ -62,6 +65,19 @@ export default function Today() {
         <DateStrip selected={date} onSelect={setDate} dotDates={dotDates} />
 
         <View style={{ padding: 20, gap: 14 }}>
+          {status.active && (
+            <Pressable testID="focus-banner" onPress={() => router.navigate('/focus')}>
+              <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: c.primarySoft, borderColor: c.primary }}>
+                <Feather name="target" size={26} color={c.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: c.sub, fontSize: 12, fontWeight: '600' }}>Focus in progress</Text>
+                  <Text numberOfLines={1} style={{ color: c.text, fontSize: 16, fontWeight: '600' }}>{status.goal}</Text>
+                </View>
+                <Text style={{ color: c.primary, fontSize: 24, fontWeight: '700', fontVariant: ['tabular-nums'] }}>{fmtDuration(remaining)}</Text>
+              </Card>
+            </Pressable>
+          )}
+
           <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 18 }}>
             <ProgressRing progress={progress} size={104} sub={`${doneCount}/${dayTasks.length}`} />
             <View style={{ flex: 1 }}>
